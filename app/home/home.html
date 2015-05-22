@@ -7,7 +7,9 @@
         {% set foo = 'bar' %}
 
         <h1>My Webpage</h1>
-        
-        {{ test }} + {{ go }}
+                
+        {{ test | not_a_filter }} 
+
+        {{ go | lower_case }}
     </body>
 </html>
