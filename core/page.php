@@ -15,12 +15,9 @@ class Page
 		'code' => '.php');
 	}
 
-	function set($variable, $content){
-		#if(is_array($this->$vars)){
-
-			#array_push($this->$vars, $variable => $content);
-			$this->vars[$variable] = $content;
-		#}
+	function set($variable, $content){		
+			
+		$this->vars[$variable] = $content;		
 	}
 
 	function templateDir(){

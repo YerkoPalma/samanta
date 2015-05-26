@@ -1,51 +1,66 @@
 <?php 
 	require_once 'vendor/autoload.php';
 	require_once 'core/page.php';
+	require_once 'core/functions.php';
+	require_once 'config.php';
+
 	Twig_Autoloader::register();
 
 	$loader = new Twig_Loader_Filesystem('app');
 	$twig = new Twig_Environment($loader);
 
+	$pages = getPagesNames();
+
 	#Este include debiese ser hecho por el .sh
-	include('app/home/home.php');
 
-	$home = new Home();
+	foreach ($pages as $page) {
+		include('app/'.$page.'/'.$page.'.php');	
 
-	#obtener nombres de metodos
-	$homeClass = get_class($home);
-	$homeMethods = get_class_methods($homeClass);
+		$page = ucwords($page);
 
-	$homeVars = get_object_vars($home);
+		$pageInstance = new $page();
 
-	#obtener nombred de filtros
-	$homeFilters = $homeVars['filters'];
+		#obtener nombres de metodos
+		$pageClass = get_class($pageInstance);
+		$pageMethods = get_class_methods($pageClass);
 
-	#obtener nombre de funciones
-	$homeFunctions = $homeVars['functions'];
+		$pageVars = get_object_vars($pageInstance);
 
-	#por cada metodo
-	foreach ($homeMethods as $homeMethod) {
+		#obtener nombred de filtros
+		$pageFilters = $pageVars['filters'];
 
-		#si es un filtro, agregar como filtro de twig
-		if(in_array($homeMethod, $homeFilters)){
-			#Registro el filtro
-			$filter = new Twig_SimpleFilter($homeMethod, array($homeClass, $homeMethod));
+		#obtener nombre de funciones
+		$pageFunctions = $pageVars['functions'];
 
-			#Lo agrego al template
-			$twig->addFilter($filter);
-		}
+		#por cada metodo
+		foreach ($pageMethods as $pageMethod) {
 
-		#si es una funcion, agregar como funcion de twig
-		if(in_array($homeMethod, $homeFunctions)){
-			#Registro el filtro
-			$function = new Twig_SimpleFunction($homeMethod, array($homeClass, $homeMethod));
+			#si es un filtro, agregar como filtro de twig
+			if(in_array($pageMethod, $pageFilters)){
+				#Registro el filtro
+				$filter = new Twig_SimpleFilter($pageMethod, array($pageClass, $pageMethod));
 
-			#Lo agrego al template
-			$twig->addFunction($function);
-		}
-	}
+				#Lo agrego al template
+				$twig->addFilter($filter);
+			}
+
+			#si es una funcion, agregar como funcion de twig
+			if(in_array($pageMethod, $pageFunctions)){
+				#Registro el filtro
+				$function = new Twig_SimpleFunction($pageMethod, array($pageClass, $pageMethod));
+
+				#Lo agrego al template
+				$twig->addFunction($function);
+			}
+		}	
+
 		
+	}
+	
+	#addPages();
 
-	echo $twig->render($home->templateDir(), $home->vars)
+	$startPage = new $start_page();
+	echo $twig->render($startPage->templateDir(), $startPage->vars);
+	#$home = new Home();	
 
 ?>
